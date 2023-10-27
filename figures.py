@@ -172,7 +172,7 @@ fig.show()
 import pandas as pd
 import plotly.graph_objects as go
 
-# Updated data
+# Updated data - needs to follow the same ordering
 data = {
     'country': ['Czech Republic', 'Germany', 'Netherlands', 'Poland', 'United Kingdom', 'United States'],
     'howitzers_committed': [38, 37.333, 8, 54, 58, 198],
@@ -293,6 +293,156 @@ fig = go.Figure(data=[go.Sankey(
 fig.update_layout(title_text="Weapons Delivered to Ukraine",
                   font=dict(size=10, color="white"),
                   plot_bgcolor="black", paper_bgcolor="black")
+
+# Show plot
+fig.show()
+
+
+-------GETTTING THERE
+
+import pandas as pd
+import plotly.graph_objects as go
+
+# Updated dataset
+data = {
+    'weapon_status': ['howitzers_committed', 'howitzers_delivered', 'mlrs_committed', 'mlrs_delivered', 'tanks_committed', 'tanks_delivered', 'aa_committed', 'aa_delivered', 'ifv_committed', 'ifv_delivered'],
+    'USA_amount': [198, 198, 38, 32, 76, 18, 15, 8, 190, 0]
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Define colors for committed and delivered categories
+colors = {
+    'committed': 'rgba(31, 119, 180, 0.8)',
+    'delivered': 'rgba(255, 127, 14, 0.8)'
+}
+
+# Create Sankey diagram
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        line=dict(color="black", width=0.5),
+        label=['Howitzers Committed', 'Howitzers Delivered', 'MLRS Committed', 'MLRS Delivered', 'Tanks Committed', 'Tanks Delivered', 'AA Committed', 'AA Delivered', 'IFV Committed', 'IFV Delivered', 'Committed', 'UKR_How','UKR_IFV','UKR_Tanks','UKR_MLRS','UKR_AA'],
+        color=['rgba(31, 119, 180, 0.8)', 'rgba(255, 127, 14, 0.8)', 'rgba(31, 119, 180, 0.8)',
+               'rgba(255, 127, 14, 0.8)', 'rgba(31, 119, 180, 0.8)', 'rgba(255, 127, 14, 0.8)',
+               'rgba(31, 119, 180, 0.8)', 'rgba(255, 127, 14, 0.8)', 'rgba(31, 119, 180, 0.8)',
+               'rgba(255, 127, 14, 0.8)', 'rgba(166, 206, 227, 0.8)', 'rgba(255, 255, 0, 0.8)']
+    ),
+    link=dict(
+        source=[0, 2, 4, 6, 8,        10, 10, 10, 10, 10, 10,10,10,10,10],  # Sources for committed flows
+        target=[10, 10, 10, 10, 10,    11,11, 12,12, 13,13, 14,14, 15,15],  # targets for committed flows
+        value=[198, 38, 76, 15, 190,    198,0, 32,6,  18,58, 8,7,  0,190],  # Total committed amount
+        color=['blue','blue','blue','blue','blue',  'blue','red','blue','red','blue','red','blue','red','blue','red',]
+    )
+)])
+
+# Update layout
+fig.update_layout(title_text="Weapons Flow to Ukraine",
+                  font=dict(size=10, color="black"),
+                  plot_bgcolor="white", paper_bgcolor="white")
+
+# Show plot
+fig.show()
+
+
+
+
+import pandas as pd
+import plotly.graph_objects as go
+
+# Updated dataset
+data = {
+    'weapon_status': ['howitzers_committed', 'howitzers_delivered', 'mlrs_committed', 'mlrs_delivered', 'tanks_committed', 'tanks_delivered', 'aa_committed', 'aa_delivered', 'ifv_committed', 'ifv_delivered'],
+    'USA_amount': [198, 198, 38, 32, 76, 18, 15, 8, 190, 0]
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Create Sankey diagram
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        line=dict(color="black", width=0.5),
+        label=['Howitzers Committed', 'MLRS Committed','Tanks Committed', 'AA Committed', 'IFV Committed', 'Committed', 'UKR_How','UKR_MLRS','UKR_Tanks','UKR_AA','UKR_IFV'],
+        color=[]
+    ),
+    link=dict(
+        source=[ 0, 1, 2, 3, 4,  5, 5, 5, 5, 5, 5,5,5,5,5],  # Sources for committed flows
+        target=[5, 5, 5, 5, 5,    6,6, 7,7, 8,8, 9,9, 10,10],  # targets for committed flows
+        value=[198, 38, 76, 15, 190,    198,0, 32,6,  18,58, 8,7,  0,190],  # Total committed amount
+        color=['blue','blue','blue','blue','blue',  'blue','red','blue','red','blue','red','blue','red','blue','red',]
+    )
+)])
+
+# Update layout
+fig.update_layout(title_text="Weapons Flow to Ukraine",
+                  font=dict(size=10, color="black"),
+                  plot_bgcolor="white", paper_bgcolor="white")
+
+# Show plot
+fig.show()
+
+----------------------------Circular exchanges
+
+import pandas as pd
+import plotly.graph_objects as go
+
+
+# Create Sankey diagram
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        line=dict(color="black", width=0.5),
+        label=['Germany', 'Greece','Czechia','Slovakia','Lithuania','Latvia', 'Ukraine'],
+        color=[]
+    ),
+    link=dict(
+        source=[ 0,0,0,0,0  ,1,2,3,4,5   ],  # Sources for committed flows
+        target=[1,2,3,4,5,   6,6,6,6,6],  # targets for committed flows
+        value=[40, 20, 30, 8, 5,     40, 16, 15, 2,3   ],  # Total committed amount
+        color=[]
+    )
+)])
+
+# Update layout
+fig.update_layout(title_text="German Circular exchanges",
+                  font=dict(size=10, color="black"),
+                  plot_bgcolor="white", paper_bgcolor="white")
+
+# Show plot
+fig.show()
+
+
+
+import pandas as pd
+import plotly.graph_objects as go
+
+# Create Sankey diagram
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        line=dict(color="black", width=0.5),
+        label=['Germany', 'Greece', 'Czechia', 'Slovakia', 'Lithuania', 'Latvia', 'Ukraine'],
+        color=[]
+    ),
+    link=dict(
+        source=[0, 0, 0, 0, 0, 1, 2, 3, 4, 5],  # Sources for committed flows
+        target=[1, 2, 3, 4, 5, 6, 6, 6, 6, 6],  # Targets for committed flows
+        value=[40, 20, 30, 8, 5, 40, 16, 15, 2, 3],  # Total committed amount
+        color=['#C2D4FF', '#C2D4FF', '#C2D4FF', '#C2D4FF', '#C2D4FF', '#FFFFB2', '#FFFFB2', '#FFFFB2', '#FFFFB2', '#FFFFB2']  # Link colors
+    )
+)])
+
+# Update layout
+fig.update_layout(title_text="German Circular exchanges",
+                  font=dict(size=10, color="black"),
+                  plot_bgcolor="white", paper_bgcolor="white")
 
 # Show plot
 fig.show()
