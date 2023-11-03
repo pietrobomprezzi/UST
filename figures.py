@@ -428,19 +428,49 @@ fig = go.Figure(data=[go.Sankey(
         pad=15,
         thickness=20,
         line=dict(color="black", width=0.5),
-        label=['Germany', 'Greece', 'Czechia', 'Slovakia', 'Lithuania', 'Latvia', 'Ukraine'],
-        color=[]
+        label=['Germany', 'Greece: Marder-1A3 for BMP-1', 'Czechia: Leopard-2A4 for T-72', 'Slovakia: Leopard-2A4 for BMP-1', 'Lithuania', 'Latvia', 'Ukraine'],
+        color=['#C2D4FF','#a6cee3', '#fdbf6f', '#b2df8a', '#ff9896', '#f0e442',  '#FFFFB2']
     ),
     link=dict(
         source=[0, 0, 0, 0, 0, 1, 2, 3, 4, 5],  # Sources for committed flows
         target=[1, 2, 3, 4, 5, 6, 6, 6, 6, 6],  # Targets for committed flows
-        value=[40, 20, 30, 8, 5, 40, 16, 15, 2, 3],  # Total committed amount
+        value=[40, 16, 15, 8, 5, 40, 20, 30, 2, 3],  # Total committed amount
         color=['#C2D4FF', '#C2D4FF', '#C2D4FF', '#C2D4FF', '#C2D4FF', '#FFFFB2', '#FFFFB2', '#FFFFB2', '#FFFFB2', '#FFFFB2']  # Link colors
     )
 )])
 
 # Update layout
 fig.update_layout(title_text="German Circular exchanges",
+                  font=dict(size=10, color="black"),
+                  plot_bgcolor="white", paper_bgcolor="white")
+
+# Show plot
+fig.show()
+
+---------------------WEAPONS TRANSFERS
+
+import pandas as pd
+import plotly.graph_objects as go
+
+# Create Sankey diagram
+fig = go.Figure(data=[go.Sankey(
+    node=dict(
+        pad=15,
+        thickness=20,
+        line=dict(color="black", width=0.5),
+        label=['United States','Netherlands','UK','Czechia industry','Belgian private', 'Tanks' , 'Howitzers 155mm'],
+        color=['#C2D4FF','#a6cee3', '#FFFFB2','#FFFFB2','#FFFFB2']
+    ),
+    link=dict(
+        source=[0,1,2,3,4],  # Sources for committed flows
+        target=[3,3,4,5,6],  # Targets for committed flows
+        value=[22.5,22.5,20,10,10],  # Total committed amount
+        color=['#C2D4FF', '#fdbf6f', '#b2df8a','#ff9896','#FFFFB2']  # Link colors
+    )
+)])
+
+# Update layout
+fig.update_layout(title_text="Main weapon exchange schemes",
                   font=dict(size=10, color="black"),
                   plot_bgcolor="white", paper_bgcolor="white")
 
