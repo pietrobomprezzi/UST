@@ -458,14 +458,14 @@ fig = go.Figure(data=[go.Sankey(
         pad=15,
         thickness=20,
         line=dict(color="black", width=0.5),
-        label=['United States','Netherlands','UK','Czechia industry','Belgian private', 'Tanks' , 'Howitzers 155mm'],
+        label=['United States','Netherlands','UK','Germany','Czechia industry','Belgian private','Domestic industry', 'Stocks', 'Tanks', 'Howitzers 155mm'],
         color=['#C2D4FF','#a6cee3', '#FFFFB2','#FFFFB2','#FFFFB2']
     ),
     link=dict(
-        source=[0,1,2,3,4],  # Sources for committed flows
-        target=[3,3,4,5,6],  # Targets for committed flows
-        value=[22.5,22.5,20,10,10],  # Total committed amount
-        color=['#C2D4FF', '#fdbf6f', '#b2df8a','#ff9896','#FFFFB2']  # Link colors
+        source=[0,1,2,3,     4,5,6],  # Sources for committed flows
+        target=[4,4,5,6,      8,9,8],  # Targets for committed flows
+        value=[22.5,22.5,20,10,   10,20,10,10],  # Total committed amount
+        color=['#C2D4FF', '#fdbf6f', '#b2df8a','#ff9896','#FFFFB2','#FFFFB2','#FFFFB2']  # Link colors
     )
 )])
 
