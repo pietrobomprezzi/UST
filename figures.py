@@ -143,9 +143,9 @@ fig.show()
 #test code
 import plotly.express as px
 import pandas as pd
-df = px.data.tips()
-fig = px.ecdf(df, x="total_bill", y="tip", color="sex", ecdfnorm=None)
-fig.show()
+#df = px.data.tips()
+#fig = px.ecdf(df, x="total_bill", y="tip", color="sex", ecdfnorm=None)
+#fig.show()
 
 
 df = pd.read_excel('weapons.xlsx')
@@ -236,7 +236,7 @@ fig.update_xaxes(
 )
 
 fig.update_yaxes(
-    title_text='Tank commitments (number of)',  # Set custom y-axis title
+    title_text='Howitzers commitments (number of)',  # Set custom y-axis title
     showline=False,                     # Show y-axis line
     linewidth=2,                       # Set y-axis line width
     linecolor='black'                  # Set y-axis line color
