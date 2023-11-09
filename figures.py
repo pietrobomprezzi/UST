@@ -136,3 +136,159 @@ fig.update_layout(title_text="Main European weapon exchange schemes (value estim
 
 # Show plot
 fig.show()
+
+#-----------------------------step plot for weapons
+
+
+#test code
+import plotly.express as px
+import pandas as pd
+df = px.data.tips()
+fig = px.ecdf(df, x="total_bill", y="tip", color="sex", ecdfnorm=None)
+fig.show()
+
+
+df = pd.read_excel('weapons.xlsx')
+#By weapon type
+
+fig = px.ecdf(df, x="months", y="Total commitments", color="Weapon type", ecdfnorm=None)
+
+fig.update_xaxes(
+    title_text='Months since start of war',  # Set custom x-axis title
+    tickvals=df.months.values,           # Set custom tick values
+    ticktext=df.Month.values,  # Set custom tick labels
+    tickangle=45,                      # Rotate tick labels for better visibility
+    showline=False,                     # Show x-axis line
+    linewidth=2,                       # Set x-axis line width
+    linecolor='black'                  # Set x-axis line color
+)
+
+fig.update_yaxes(
+    title_text='Weapon commitments (number of)',  # Set custom y-axis title
+    showline=False,                     # Show y-axis line
+    linewidth=2,                       # Set y-axis line width
+    linecolor='black'                  # Set y-axis line color
+)
+
+fig.update_layout(
+    plot_bgcolor='lightgray',  # Set the background color of the plot
+    legend=dict(
+        title='Weapon Type',  # Set custom legend title
+        orientation='h',       # Set legend orientation to horizontal ('h') or vertical ('v')
+        yanchor='bottom',      # Set legend anchor point along the y-axis
+        y=1.02,                # Set legend position relative to the chart
+        xanchor='right',       # Set legend anchor point along the x-axis
+        x=1                    # Set legend position relative to the chart
+    )
+)
+
+# Show the modified figure
+fig.show()
+
+#By country - tanks
+df2 = df.loc[df['Weapon type']=='Tanks']
+fig = px.ecdf(df2, x="months", y=['EU','non-EU NATO','US'], ecdfnorm=None)
+
+fig.update_xaxes(
+    title_text='Months since start of war',  # Set custom x-axis title
+    tickvals=df2.months.values,           # Set custom tick values
+    ticktext=df2.Month.values,  # Set custom tick labels
+    tickangle=45,                      # Rotate tick labels for better visibility
+    showline=False,                     # Show x-axis line
+    linewidth=2,                       # Set x-axis line width
+    linecolor='black'                  # Set x-axis line color
+)
+
+fig.update_yaxes(
+    title_text='Tank commitments (number of)',  # Set custom y-axis title
+    showline=False,                     # Show y-axis line
+    linewidth=2,                       # Set y-axis line width
+    linecolor='black'                  # Set y-axis line color
+)
+
+fig.update_layout(
+    plot_bgcolor='lightgray',  # Set the background color of the plot
+    legend=dict(
+        title='Donor group',  # Set custom legend title
+        orientation='h',       # Set legend orientation to horizontal ('h') or vertical ('v')
+        yanchor='bottom',      # Set legend anchor point along the y-axis
+        y=1.02,                # Set legend position relative to the chart
+        xanchor='right',       # Set legend anchor point along the x-axis
+        x=1                    # Set legend position relative to the chart
+    )
+)
+
+# Show the modified figure
+fig.show()
+
+#By country - howitzers
+df2 = df.loc[df['Weapon type']=='Howitzers']
+fig = px.ecdf(df2, x="months", y=['EU','non-EU NATO','US'], ecdfnorm=None)
+
+fig.update_xaxes(
+    title_text='Months since start of war',  # Set custom x-axis title
+    tickvals=df2.months.values,           # Set custom tick values
+    ticktext=df2.Month.values,  # Set custom tick labels
+    tickangle=45,                      # Rotate tick labels for better visibility
+    showline=False,                     # Show x-axis line
+    linewidth=2,                       # Set x-axis line width
+    linecolor='black'                  # Set x-axis line color
+)
+
+fig.update_yaxes(
+    title_text='Tank commitments (number of)',  # Set custom y-axis title
+    showline=False,                     # Show y-axis line
+    linewidth=2,                       # Set y-axis line width
+    linecolor='black'                  # Set y-axis line color
+)
+
+fig.update_layout(
+    plot_bgcolor='lightgray',  # Set the background color of the plot
+    legend=dict(
+        title='Donor group',  # Set custom legend title
+        orientation='h',       # Set legend orientation to horizontal ('h') or vertical ('v')
+        yanchor='bottom',      # Set legend anchor point along the y-axis
+        y=1.02,                # Set legend position relative to the chart
+        xanchor='right',       # Set legend anchor point along the x-axis
+        x=1                    # Set legend position relative to the chart
+    )
+)
+
+# Show the modified figure
+fig.show()
+
+#By country - MLRS
+df2 = df.loc[df['Weapon type']=='MLRS']
+fig = px.ecdf(df2, x="months", y=['EU','non-EU NATO','US'], ecdfnorm=None)
+
+fig.update_xaxes(
+    title_text='Months since start of war',  # Set custom x-axis title
+    tickvals=df2.months.values,           # Set custom tick values
+    ticktext=df2.Month.values,  # Set custom tick labels
+    tickangle=45,                      # Rotate tick labels for better visibility
+    showline=False,                     # Show x-axis line
+    linewidth=2,                       # Set x-axis line width
+    linecolor='black'                  # Set x-axis line color
+)
+
+fig.update_yaxes(
+    title_text='Tank commitments (number of)',  # Set custom y-axis title
+    showline=False,                     # Show y-axis line
+    linewidth=2,                       # Set y-axis line width
+    linecolor='black'                  # Set y-axis line color
+)
+
+fig.update_layout(
+    plot_bgcolor='lightgray',  # Set the background color of the plot
+    legend=dict(
+        title='Donor group',  # Set custom legend title
+        orientation='h',       # Set legend orientation to horizontal ('h') or vertical ('v')
+        yanchor='bottom',      # Set legend anchor point along the y-axis
+        y=1.02,                # Set legend position relative to the chart
+        xanchor='right',       # Set legend anchor point along the x-axis
+        x=1                    # Set legend position relative to the chart
+    )
+)
+
+# Show the modified figure
+fig.show()
