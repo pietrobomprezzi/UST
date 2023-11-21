@@ -13,6 +13,9 @@ __pycache__/
 /other_stuff_output/
 /testing/
 /website/
+/Shapefile/
+/old/
+/output/
 #data files to ignore
 *.csv
 
