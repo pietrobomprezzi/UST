@@ -15,7 +15,6 @@ __pycache__/
 /website/
 /Shapefile/
 /old/
-/output/
 #data files to ignore
 *.csv
 
