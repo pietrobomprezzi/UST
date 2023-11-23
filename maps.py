@@ -12,6 +12,7 @@ from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 from matplotlib.colors import Normalize
 import geopandas as gpd
+import datetime
 
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
@@ -70,15 +71,19 @@ gdf.plot()
 #OLD WAY IMPORT DATA import and prep refugee data
 #df_refugee = pd.read_excel('Refugee data.xlsx', 'Geopandas_311023')
 
-#new way to import data compute variations
+#----------new way to import data compute variations
 df_refugee = pd.read_excel('Refugee data.xlsx', 'refugee data latest')
 
+#now i just copy paste from the Release excel file the data table "Refugees recorded"
+#gen new date variable 
+df_refugee['day'] = [a.day for a in df_refugee['Data Date']]
+df_refugee['Data Date'] = [datetime.datetime(a,b,c) for a,b,c in zip(df_refugee['Year'],df_refugee['Month'],df_refugee['day'])]
 #get last refugee number - ASSUMING DATA IS ALREADY SORTED BY DONOR AND DATE
 def get_last_value(series):
     return series.iloc[-1]
 
 # Create a new column 'Last_Value' with the last value of each group
-df_refugee['Number'] = df_refugee.groupby('iso3')['Individuals'].transform(get_last_value)
+df_refugee['Number'] = df_refugee.groupby('ISO3')['Individuals'].transform(get_last_value)
 #cutoff of PREVIOUS RELEASE - CHANGE ACCORDINGLY
 # Specify the year, month, and day
 year = 2023
@@ -96,16 +101,16 @@ def find_closest_date_before_cutoff(series, cutoff_date):
     # Find the closest date before the cutoff
     closest_date = filtered_series.max()
     
-    return closest_date
+#    return closest_date
 
-df_refugee['Closest_Date_Before_Cutoff'] = df_refugee.groupby('iso3')['Data date'].transform(
+df_refugee['Closest_Date_Before_Cutoff'] = df_refugee.groupby('ISO3')['Data date'].transform(
     lambda group_series: find_closest_date_before_cutoff(group_series, cutoff)
 )
 
 # value at last cutoff date
 df_refugee['Temp_Column'] = df_refugee.apply(lambda row: row['Individuals'] if row['Data date'] == row['Closest_Date_Before_Cutoff'] else None, axis=1)
 
-df_refugee['last_number'] = df_refugee.groupby('iso3')['Temp_Column'].transform('max')
+df_refugee['last_number'] = df_refugee.groupby('ISO3')['Temp_Column'].transform('max')
 # Drop the temporary column
 df_refugee = df_refugee.drop(columns=['Temp_Column'])
 
@@ -114,7 +119,7 @@ df_refugee = df_refugee.drop(columns=['Temp_Column'])
 df_refugee['variation'] = df_refugee['Number'] - df_refugee['last_number']
 
 # refugee data with shapefile
-me_refugee = gdf.merge(df_refugee, left_on='iso', right_on='iso3', how='left', suffixes=('_shape', ''))
+me_refugee = gdf.merge(df_refugee, left_on='iso', right_on='ISO3', how='left', suffixes=('_shape', ''))
 
 # Create a custom polygon
 polygon = Polygon([(-25,35.225), (50.5,35.225), (50.5,72.5),(-25,75)])
