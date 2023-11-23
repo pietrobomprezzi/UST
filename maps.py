@@ -12,7 +12,6 @@ from matplotlib.patches import PathPatch
 from matplotlib.path import Path
 from matplotlib.colors import Normalize
 import geopandas as gpd
-import datetime
 
 pd.options.mode.chained_assignment = None
 pd.set_option('display.max_columns', None)
@@ -68,22 +67,15 @@ gdf = pd.concat([gdf, gdf_crimea])
 print("Shape:", gdf.shape)
 gdf.plot()
 
-#OLD WAY IMPORT DATA import and prep refugee data
-#df_refugee = pd.read_excel('Refugee data.xlsx', 'Geopandas_311023')
+#data is raw UNCHR data
+df_refugee = pd.read_excel('Refugee data.xlsx', '311023 UNCHR data')
+pop = pd.read_excel('Refugee data.xlsx', 'country sample and pop')
 
-#----------new way to import data compute variations
-df_refugee = pd.read_excel('Refugee data.xlsx', 'refugee data latest')
-
-#now i just copy paste from the Release excel file the data table "Refugees recorded"
-#gen new date variable 
-df_refugee['day'] = [a.day for a in df_refugee['Data Date']]
-df_refugee['Data Date'] = [datetime.datetime(a,b,c) for a,b,c in zip(df_refugee['Year'],df_refugee['Month'],df_refugee['day'])]
-#get last refugee number - ASSUMING DATA IS ALREADY SORTED BY DONOR AND DATE
 def get_last_value(series):
     return series.iloc[-1]
 
 # Create a new column 'Last_Value' with the last value of each group
-df_refugee['Number'] = df_refugee.groupby('ISO3')['Individuals'].transform(get_last_value)
+df_refugee['Number'] = df_refugee.groupby('iso3')['individuals'].transform(get_last_value)
 #cutoff of PREVIOUS RELEASE - CHANGE ACCORDINGLY
 # Specify the year, month, and day
 year = 2023
@@ -101,25 +93,26 @@ def find_closest_date_before_cutoff(series, cutoff_date):
     # Find the closest date before the cutoff
     closest_date = filtered_series.max()
     
-#    return closest_date
+    return closest_date
 
-df_refugee['Closest_Date_Before_Cutoff'] = df_refugee.groupby('ISO3')['Data date'].transform(
+df_refugee['Closest_Date_Before_Cutoff'] = df_refugee.groupby('iso3')['correct date'].transform(
     lambda group_series: find_closest_date_before_cutoff(group_series, cutoff)
 )
 
 # value at last cutoff date
-df_refugee['Temp_Column'] = df_refugee.apply(lambda row: row['Individuals'] if row['Data date'] == row['Closest_Date_Before_Cutoff'] else None, axis=1)
+df_refugee['Temp_Column'] = df_refugee.apply(lambda row: row['individuals'] if row['correct date'] == row['Closest_Date_Before_Cutoff'] else None, axis=1)
 
-df_refugee['last_number'] = df_refugee.groupby('ISO3')['Temp_Column'].transform('max')
+df_refugee['last_number'] = df_refugee.groupby('iso3')['Temp_Column'].transform('max')
 # Drop the temporary column
 df_refugee = df_refugee.drop(columns=['Temp_Column'])
 
 #basic calculations
 #variation since last release -many negatives
-df_refugee['variation'] = df_refugee['Number'] - df_refugee['last_number']
+df_refugee['variation'] = (df_refugee['Number'] - df_refugee['last_number'])/df_refugee['last_number']
+
 
 # refugee data with shapefile
-me_refugee = gdf.merge(df_refugee, left_on='iso', right_on='ISO3', how='left', suffixes=('_shape', ''))
+me_refugee = gdf.merge(df_refugee[['iso3','Number','last_number','variation']], left_on='iso', right_on='iso3', how='left', suffixes=('_shape', ''))
 
 # Create a custom polygon
 polygon = Polygon([(-25,35.225), (50.5,35.225), (50.5,72.5),(-25,75)])
@@ -131,6 +124,8 @@ europe = gpd.clip(me_refugee, polygon)
 
 #collapse to the iso3 level otherwise double info
 europe = europe.groupby('country').first().reset_index()
+#add percent population
+europe = europe.merge(pop, left_on='country', right_on='Country', how='left',validate = '1:1')
 
 # MAP 1 absolute values
 
@@ -145,13 +140,62 @@ mpl.rc('hatch', color='black', linewidth=0.20)
 
 europe[europe.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
 
-europe.plot(column='Number', ax=ax, legend=True, cmap='Blues', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, legend_kwds={'shrink': 0.250, 'orientation':'horizontal','anchor': (0.5, 2.0),'format':"%.0f"})
-
+europe.plot(column='Number', ax=ax, legend=True, cmap='Blues', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, legend_kwds={'shrink': 0.250, 'orientation':'horizontal','anchor': (0.5, 2.0),'format':"%.0f", 'pad': 0.1})
 
 cb_ax = fig.axes[1]
 cb_ax.tick_params(labelsize=9)
 
 plt.show()
+
+#% of population
+europe['percent'] = europe['Number']/europe['Population2020']
+
+fig, ax = plt.subplots(1, 1)
+
+ax.axis('off')
+ax.margins(x=0.0)
+
+fig.set_size_inches(16, 10)
+
+mpl.rc('hatch', color='black', linewidth=0.20)
+
+europe[europe.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+
+europe.plot(column='percent', ax=ax, legend=True, cmap='Blues', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, legend_kwds={'shrink': 0.250, 'orientation':'horizontal','anchor': (0.5, 2.0), 'pad': 0.1})
+
+cb_ax = fig.axes[1]
+cb_ax.tick_params(labelsize=9)
+
+plt.show()
+
+
+#-------------NEW MAPS WORK IN PROGRESS
+
+#% of population
+pop = pd.read_excel('Refugee data.xlsx', 'population 2020')
+
+europe2 = europe.merge(pop, left_on='country', right_on='Country', how='left',validate = '1:1')
+
+europe2['percent'] = europe2['Number']/europe2['Population in 2020']
+
+fig, ax = plt.subplots(1, 1)
+
+ax.axis('off')
+ax.margins(x=0.0)
+
+fig.set_size_inches(16, 10)
+
+mpl.rc('hatch', color='black', linewidth=0.20)
+
+europe2[europe2.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+
+europe2.plot(column='percent', ax=ax, legend=True, cmap='Blues', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, legend_kwds={'shrink': 0.250, 'orientation':'horizontal','anchor': (0.5, 2.0), 'pad': 0.1})
+
+cb_ax = fig.axes[1]
+cb_ax.tick_params(labelsize=9)
+
+plt.show()
+
 
 # MAP 2 absolute values with arrows
 #map with total values, arrows with variation
