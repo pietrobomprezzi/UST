@@ -504,3 +504,44 @@ total_circle = circlify.Circle(x=lim/2, y=0, r=lim, level=1)
 ax.add_patch(plt.Circle((total_circle.x, total_circle.y), total_circle.r, alpha=0.2, linewidth=2, color="red"))
 
 plt.show()
+
+
+#STACKED PERCENTAGE PLOTS
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the Excel file
+UST_full = pd.read_excel("Ukraine_Support_Tracker_Release_14_YD.xlsx",
+                        sheet_name="Commitments per Month",
+                        header=10,  # Skip the first 10 rows
+                        usecols="B:AA")
+
+# Cleaning, getting rid of the empty row on top
+UST_full = UST_full.iloc[1:]
+
+# Pivot the dataframe
+pivoted = UST_full.melt(id_vars=["Country"], value_vars=UST_full.columns[2:],
+                       var_name="month", value_name="contribution")
+
+# Apply the 'highlight' condition
+highlight_countries = ['United States', 'France', 'Germany', 'EU (Commission and Council)']
+pivoted["highlight"] = pivoted["Country"].apply(lambda x: x if x in highlight_countries else "Other")
+
+# Format columns correctly
+pivoted["month"] = pd.to_numeric(pivoted["month"], errors="coerce")
+pivoted["highlight"] = pd.Categorical(pivoted["highlight"])
+
+#collapse dataset to month-group ("highlight") level taking the sum of all contributions. will need this later for computing percentage of
+pivoted = pivoted.groupby(["month", "highlight"], as_index=False)["contribution"].sum()
+
+# Pivot the DataFrame for better handling
+df_pivot = pivoted.pivot(index='month', columns='highlight', values='contribution').fillna(0)
+
+#put in terms of percentages of whole
+data_perc = df_pivot.divide(df_pivot.sum(axis=1), axis=0)
+
+plt.stackplot(data_perc.index, data_perc.values.T, labels=data_perc.columns)
+plt.legend(loc='upper left')
+plt.margins(0,0)
+plt.title('100 % stacked area chart')
+plt.show()
