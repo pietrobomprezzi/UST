@@ -1,5 +1,4 @@
 
-
 #EUROPE MAPS - AID % GDP OVER TIME
 
 # Import packages and setup
@@ -72,7 +71,7 @@ gdf = pd.concat([gdf, gdf_crimea])
 
 #final world  gdf
 print("Shape:", gdf.shape)
-gdf.plot()
+#gdf.plot()
 
 #REMEMBER TO UPDATE THE DATA SHEET IN THIS FOLDER WITH LATEST UST DATA
 gdpdata = pd.read_excel('latest UST data.xlsx','country summary (euro)')
@@ -119,7 +118,6 @@ data_UST._merge.value_counts()
 # Create a custom polygon
 polygon = Polygon([(-25,35.225), (50.5,35.225), (50.5,72.5),(-25,75)])
 
-poly_gdf = gpd.GeoDataFrame([1], geometry=[polygon], crs=data_UST.crs)
 # Clip polygon from the map of Europe
 europe = gpd.clip(data_UST, polygon)
 
@@ -128,7 +126,7 @@ monthlist = ['January (2022)', 'February (2022)', 'March (2022)', 'April (2022)'
  'April (2023)', 'May (2023)', 'June (2023)', 'July (2023)', 'August (2023)', 'September (2023)',
  'October (2023)', 'November (2023)', 'December (2023)', 'January, 15th (2024)']
 
-# MAP 1 % military COMMITMENTS over time
+# MAP 1 military COMMITMENTS over time
 
 #using a loop to make n graphs and save them
 
@@ -141,6 +139,10 @@ vmin, vmax = 0, 25
 
 #set a loop variable for saving in correct order for gif
 i = 1
+
+#duplicate the dataset because i need to overwrite it
+europecopy = europe.copy()
+
 for month in monthlist:
         
     fig, ax = plt.subplots(1, 1)
@@ -149,13 +151,13 @@ for month in monthlist:
     fig.set_size_inches(16, 10)
     mpl.rc('hatch', color='black', linewidth=0.20)
 
-    europe[europe.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+    europecopy[europecopy.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
 
     #COLUMN TO PLOT IS THE MONTH COLUMN
-    europe.plot(column=month, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+    europecopy.plot(column=month, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 
     # Add values on top of the map, excluding "nan"
-    for idx, row in europe.iterrows():
+    for idx, row in europecopy.iterrows():
         x, y = row.geometry.centroid.x, row.geometry.centroid.y
         value = row[month]
         if not math.isnan(value):
@@ -192,14 +194,14 @@ vmin, vmax = 0, 5
 #set a loop variable for saving in correct order for gif
 i = 1
 #duplicate the dataset because i need to overwrite it
-europegdp = europe.copy()
+europecopy = europe.copy()
 
 for month in monthlist:
 
     #convert to % GDP
-    percgdp = [(a/b)*100 for (a,b) in zip(europegdp[month],europegdp['GDP (2021) € billion'])]
+    percgdp = [(a/b)*100 for (a,b) in zip(europecopy[month],europecopy['GDP (2021) € billion'])]
 
-    europegdp[month] = percgdp 
+    europecopy[month] = percgdp 
         
     fig, ax = plt.subplots(1, 1)
     ax.axis('off')
@@ -207,13 +209,13 @@ for month in monthlist:
     fig.set_size_inches(16, 10)
     mpl.rc('hatch', color='black', linewidth=0.20)
 
-    europegdp[europegdp.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+    europecopy[europecopy.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
 
     #COLUMN TO PLOT IS THE MONTH COLUMN
-    europegdp.plot(column=month, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+    europecopy.plot(column=month, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 
     # Add values on top of the map, excluding "nan"
-    for idx, row in europegdp.iterrows():
+    for idx, row in europecopy.iterrows():
         x, y = row.geometry.centroid.x, row.geometry.centroid.y
         value = row[month]
         if not math.isnan(value):
@@ -237,6 +239,187 @@ for month in monthlist:
     plt.savefig(filepath, bbox_inches='tight',dpi = 300)
     #increment
     i = i + 1
+
+#---------------------------QUARTERLY FIGURES
+
+#need to re import and re prep the data
+    
+#import table data for military COMMITMENTS
+data_UST = pd.read_excel('latest UST data.xlsx','commitments month military euro')
+#drop euro dummy problematic for cumu sum
+data_UST = data_UST.drop('EU member', axis=1)
+
+#drop last month inconsistent and creates problems
+data_UST = data_UST.drop('January, 15th (2024)', axis=1)
+
+#quarterly sums
+# Create a list of quarter columns
+quarters = ['Jan - Mar (2022)', 'Apr - Jun (2022)', 'Jul - Sep (2022)', 'Oct - Dec (2022)','Jan - Mar (2023)', 'Apr - Jun (2023)', 'Jul - Sep (2023)', 'Oct - Dec (2023)']
+
+# Create a new DataFrame to store the cumulative quarterly sums
+result_df = pd.DataFrame()
+
+# Initialize a Series for cumulative sum across quarters
+cumulative_sum_all_quarters = pd.Series(0, index=data_UST.index)
+
+# Iterate through each quarter and calculate the cumulative sum for each country
+for i in range(1, len(data_UST.columns), 3):
+    quarter_columns = data_UST.columns[i:i+3]
+    quarter_name = quarters[i//3]
+    
+    # Calculate the sum for the current quarter
+    quarterly_sum = data_UST[quarter_columns].sum(axis=1)
+    
+    # Update the cumulative sum for all quarters
+    cumulative_sum_all_quarters += quarterly_sum
+    
+    # Assign the cumulative sum to the result DataFrame
+    result_df[quarter_name] = cumulative_sum_all_quarters
+
+# Include the 'Country' column in the result DataFrame
+result_df['Country'] = data_UST['Country']
+
+# Reorder the columns to have 'Country' as the first column
+result_df = result_df[['Country'] + quarters]
+
+
+#add iso
+iso3 = [countrynames.to_code_3(r,fuzzy=True) for r in result_df['Country']]
+result_df['iso3'] = iso3 
+
+#merge in GDP data
+result_df = result_df.merge(gdpdata,on='iso3',how='left')
+
+# CREATE GEODATAFRAME
+result_df = gdf.merge(result_df, left_on='iso', right_on='iso3', how='left', suffixes=('_shape', ''),indicator=True)
+#check
+result_df._merge.value_counts()
+#both==41, ok as it should be
+
+# Create a custom polygon
+polygon = Polygon([(-25,35.225), (50.5,35.225), (50.5,72.5),(-25,75)])
+
+# Clip polygon from the map of Europe
+europe = gpd.clip(result_df, polygon)
+
+
+
+# MAP 3 QUARTERLY military COMMITMENTS over time
+
+#using a loop to make n graphs and save them
+
+# save all the maps in the charts folder
+output_path = 'output/quarterly military comm maps'
+
+# set the min and max range for the choropleth map
+#values should be based on data
+vmin, vmax = 0, 25
+
+#set a loop variable for saving in correct order for gif
+i = 1
+
+#duplicate the dataset because i need to overwrite it
+europecopy = europe.copy()
+
+for quarter in quarters:
+        
+    fig, ax = plt.subplots(1, 1)
+    ax.axis('off')
+    ax.margins(x=0.0)
+    fig.set_size_inches(16, 10)
+    mpl.rc('hatch', color='black', linewidth=0.20)
+
+    europecopy[europecopy.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+
+    #COLUMN TO PLOT IS THE QUARTER COLUMN
+    europecopy.plot(column=quarter, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+
+    # Add values on top of the map, excluding "nan"
+    for idx, row in europecopy.iterrows():
+        x, y = row.geometry.centroid.x, row.geometry.centroid.y
+        value = row[quarter]
+        if not math.isnan(value):
+            text = ax.annotate(f'{value:.2f}', xy=(x, y), xytext=(-15, 0), textcoords="offset points", fontsize=10, color='black',weight='bold')
+            text.set_path_effects([withStroke(linewidth=2, foreground='white')])
+
+
+    title_font = fm.FontProperties(family='Copperplate Gothic Bold', style='normal', size=16)
+    ax.set_title("Military Commitments, Total bilateral", fontproperties=title_font,loc='left')
+
+    # Add a subtitle
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
+    ax.text(0.5, 0.95, "Total military commitments as of the period "  + quarter, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+
+    # Add a footnote
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid. In billion Euro.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
+
+    #CHANGE ACCORDINGLY
+    filepath = os.path.join(output_path,"{}_{}_cumu_mil_comm_quart.png".format(i, quarter))
+    plt.savefig(filepath, bbox_inches='tight',dpi = 300)
+    #increment
+    i = i+1
+
+
+
+# MAP 4 QUARTERLY % military COMMITMENTS over time as GDP
+
+# save all the maps in the charts folder
+output_path = 'output/quarterly military comm maps gdp'
+
+# set the min and max range for the choropleth map
+#values should be based on data UPDATE ACCORDINGLY
+vmin, vmax = 0, 5
+#set a loop variable for saving in correct order for gif
+i = 1
+#duplicate the dataset because i need to overwrite it
+europecopy = europe.copy()
+
+for quarter in quarters:
+
+    #convert to % GDP
+    percgdp = [(a/b)*100 for (a,b) in zip(europecopy[quarter],europecopy['GDP (2021) € billion'])]
+
+    europecopy[quarter] = percgdp 
+        
+    fig, ax = plt.subplots(1, 1)
+    ax.axis('off')
+    ax.margins(x=0.0)
+    fig.set_size_inches(16, 10)
+    mpl.rc('hatch', color='black', linewidth=0.20)
+
+    europecopy[europecopy.iso == 'UKR'].plot(ax=ax, edgecolor='black', linewidth=0.125, color='lightgrey', hatch='//////', legend=False, zorder=2)
+
+    #COLUMN TO PLOT IS THE QUARTER COLUMN
+    europecopy.plot(column=quarter, ax=ax, legend=False, cmap='OrRd', edgecolor='gray', linewidth=0.15, missing_kwds={'color': 'gainsboro'}, vmin=vmin, vmax=vmax, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+
+    # Add values on top of the map, excluding "nan"
+    for idx, row in europecopy.iterrows():
+        x, y = row.geometry.centroid.x, row.geometry.centroid.y
+        value = row[quarter]
+        if not math.isnan(value):
+            text = ax.annotate(f'{value:.2f}', xy=(x, y), xytext=(-15, 0), textcoords="offset points", fontsize=10, color='black',weight='bold')
+            text.set_path_effects([withStroke(linewidth=2, foreground='white')])
+
+
+    title_font = fm.FontProperties(family='Copperplate Gothic Bold', style='normal', size=16)
+    ax.set_title("Military Commitments, % 2021 GDP", fontproperties=title_font,loc='left')
+
+    # Add a subtitle
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
+    ax.text(0.5, 0.95, "Total military commitments as of the period "  + quarter, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+
+    # Add a footnote
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
+
+    #CHANGE ACCORDINGLY
+    filepath = os.path.join(output_path,"{}_{}_cumu_mil_comm_quart_gdp.png".format(i, quarter))
+    plt.savefig(filepath, bbox_inches='tight',dpi = 300)
+    #increment
+    i = i + 1
+
+
 
 #--------------CONVERTING TO GIFS
 from PIL import Image
@@ -265,9 +448,13 @@ input_folder = "output/military comm maps"
 output_folder = "output/military comm maps/jpg"
 convert_png_to_jpg(input_folder, output_folder)
 
+input_folder = "output/quarterly military comm maps"
+output_folder = "output/quarterly military comm maps/jpg"
+convert_png_to_jpg(input_folder, output_folder)
+
 #military comm maps gdp
-input_folder = "output/military comm maps gdp"
-output_folder = "output/military comm maps gdp/jpg"
+input_folder = "output/quarterly military comm maps gdp"
+output_folder = "output/quarterly military comm maps gdp/jpg"
 convert_png_to_jpg(input_folder, output_folder)
 
 
@@ -292,11 +479,18 @@ def create_gif(folder_path, output_gif_path, fps=.5,repeat_indefinitely=True):
 
 #military comm maps
 folder_path = "output/military comm maps/jpg"
-output_gif_path = "output/military_comms.gif"
+output_gif_path = "output/military_comm.gif"
 create_gif(folder_path, output_gif_path)
 
+folder_path = "output/quarterly military comm maps/jpg"
+output_gif_path = "output/quarterly military_comm.gif"
+create_gif(folder_path, output_gif_path)
 
 #military comm maps gdp
 folder_path = "output/military comm maps gdp/jpg"
-output_gif_path = "output/military_comms_gdp.gif"
+output_gif_path = "output/military_comm_gdp.gif"
+create_gif(folder_path, output_gif_path)
+
+folder_path = "output/quarterly military comm maps gdp/jpg"
+output_gif_path = "output/quarterly military_comm_gdp.gif"
 create_gif(folder_path, output_gif_path)
