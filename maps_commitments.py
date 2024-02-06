@@ -4,10 +4,8 @@
 # Import packages and setup
 import geopandas as gpd
 import matplotlib as mpl
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import pandas as pd
-from datetime import datetime
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from shapely.geometry import Polygon
 import countrynames
@@ -18,7 +16,6 @@ from matplotlib.patheffects import withStroke
 import os 
 
 import geopandas as gpd
-import datetime
 
 #for gifs
 import imageio
@@ -169,11 +166,11 @@ for month in monthlist:
     ax.set_title("Military Commitments, Total bilateral", fontproperties=title_font,loc='left')
 
     # Add a subtitle
-    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
-    ax.text(0.5, 0.95, "Total military commitments as of "  + month, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=14)
+    ax.text(0.2, 0.95, "As of "  + month, ha='center', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
 
     # Add a footnote
-    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=11)
     ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid. In billion Euro.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
 
     #CHANGE ACCORDINGLY
@@ -227,11 +224,11 @@ for month in monthlist:
     ax.set_title("Military Commitments, % 2021 GDP", fontproperties=title_font,loc='left')
 
     # Add a subtitle
-    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
-    ax.text(0.5, 0.95, "Total military commitments as of "  + month, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=14)
+    ax.text(0.2, 0.95, "As of "  + month, ha='center', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
 
     # Add a footnote
-    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=11)
     ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
 
     #CHANGE ACCORDINGLY
@@ -347,11 +344,11 @@ for quarter in quarters:
     ax.set_title("Military Commitments, Total bilateral", fontproperties=title_font,loc='left')
 
     # Add a subtitle
-    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
-    ax.text(0.5, 0.95, "Total military commitments as of the period "  + quarter, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=14)
+    ax.text(0.2, 0.95, "As of "  + quarter, ha='center', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
 
     # Add a footnote
-    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=11)
     ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid. In billion Euro.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
 
     #CHANGE ACCORDINGLY
@@ -406,11 +403,11 @@ for quarter in quarters:
     ax.set_title("Military Commitments, % 2021 GDP", fontproperties=title_font,loc='left')
 
     # Add a subtitle
-    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=9)
-    ax.text(0.5, 0.95, "Total military commitments as of the period "  + quarter, ha='right', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
+    subtitle_font = fm.FontProperties(family='Copperplate Gothic Light', style='italic', size=14)
+    ax.text(0.2, 0.95, "As of "  + quarter, ha='center', va='center', fontproperties=subtitle_font, transform=ax.transAxes)
 
     # Add a footnote
-    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=8)
+    footnote_font = fm.FontProperties(family='Calibri', style='normal', size=11)
     ax.text(0.5, 0.02, "Note: Short and multi-year. Does not include EU aid.", ha='right', va='center', fontproperties=footnote_font, transform=ax.transAxes)
 
     #CHANGE ACCORDINGLY
@@ -460,7 +457,7 @@ convert_png_to_jpg(input_folder, output_folder)
 
 #convert to gif
 
-def create_gif(folder_path, output_gif_path, fps=.5,repeat_indefinitely=True):
+def create_gif(folder_path, output_gif_path, fps=.25,repeat_indefinitely=False):
     images = []
 
     # Get the list of JPG files in the folder
