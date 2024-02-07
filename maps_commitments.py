@@ -457,7 +457,7 @@ convert_png_to_jpg(input_folder, output_folder)
 
 #convert to gif
 
-def create_gif(folder_path, output_gif_path, fps=.25,repeat_indefinitely=False):
+def create_gif(folder_path, output_gif_path, fps= 1,loop=1):
     images = []
 
     # Get the list of JPG files in the folder
@@ -472,7 +472,7 @@ def create_gif(folder_path, output_gif_path, fps=.25,repeat_indefinitely=False):
         images.append(imageio.imread(image_path))
 
     # Create the GIF
-    imageio.mimsave(output_gif_path, images, fps=fps,loop=0)
+    imageio.mimsave(output_gif_path, images, fps=fps,loop=loop)
 
 #military comm maps
 folder_path = "output/military comm maps/jpg"
