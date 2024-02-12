@@ -449,7 +449,11 @@ input_folder = "output/quarterly military comm maps"
 output_folder = "output/quarterly military comm maps/jpg"
 convert_png_to_jpg(input_folder, output_folder)
 
-#military comm maps gdp
+#gdp
+input_folder = "output/military comm maps gdp"
+output_folder = "output/military comm maps gdp/jpg"
+convert_png_to_jpg(input_folder, output_folder)
+
 input_folder = "output/quarterly military comm maps gdp"
 output_folder = "output/quarterly military comm maps gdp/jpg"
 convert_png_to_jpg(input_folder, output_folder)
